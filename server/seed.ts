@@ -4,41 +4,57 @@ import { storage } from "./storage";
 export async function seedDatabase() {
   const existingCities = await storage.getCities();
   if (existingCities.length === 0) {
-    console.log("Seeding database with default cities...");
+    console.log("Деректер базасын әдепкі қалалармен толтыру...");
     await storage.createCity({
-      name: "London",
+      name: "Лондон",
       lat: "51.5074",
       lon: "-0.1278",
-      country: "United Kingdom",
-      admin1: "England",
+      country: "Біріккен Корольдік",
+      admin1: "Англия",
       isFavorite: true
     });
     await storage.createCity({
-      name: "New York",
+      name: "Нью-Йорк",
       lat: "40.7128",
       lon: "-74.0060",
-      country: "United States",
-      admin1: "New York",
+      country: "АҚШ",
+      admin1: "Нью-Йорк",
       isFavorite: true
     });
     await storage.createCity({
-      name: "Tokyo",
+      name: "Токио",
       lat: "35.6895",
       lon: "139.6917",
-      country: "Japan",
-      admin1: "Tokyo",
+      country: "Жапония",
+      admin1: "Токио",
       isFavorite: false
     });
     await storage.createCity({
-      name: "Sydney",
+      name: "Сидней",
       lat: "-33.8688",
       lon: "151.2093",
-      country: "Australia",
-      admin1: "New South Wales",
+      country: "Аустралия",
+      admin1: "Жаңа Оңтүстік Уэльс",
       isFavorite: false
     });
-    console.log("Seeding complete.");
+    await storage.createCity({
+      name: "Алматы",
+      lat: "43.2389",
+      lon: "76.8897",
+      country: "Қазақстан",
+      admin1: "Алматы",
+      isFavorite: true
+    });
+    await storage.createCity({
+      name: "Астана",
+      lat: "51.1605",
+      lon: "71.4272",
+      country: "Қазақстан",
+      admin1: "Астана",
+      isFavorite: true
+    });
+    console.log("Толтыру аяқталды.");
   } else {
-      console.log("Database already seeded.");
+      console.log("Деректер базасы қазірдің өзінде толтырылған.");
   }
 }

@@ -12,10 +12,10 @@ export function SmartInsights({ data }: { data: WeatherData }) {
   const uvHigh = current.uvIndex > 5;
   
   const clothingRecommendation = () => {
-    if (isRaining) return "Pack a raincoat or umbrella.";
-    if (isCold) return "Layer up! A warm jacket is recommended.";
-    if (isHot) return "Light, breathable clothing is best.";
-    return "Comfortable casual wear is perfect.";
+    if (isRaining) return "Жамбылдайтын киім немесе қолшатыр алыңыз.";
+    if (isCold) return "Жылы киініңіз! Жылы куртка кию ұсынылады.";
+    if (isHot) return "Жеңіл, дем алатын киім ең жақсы таңдау болады.";
+    return "Ыңғайлы күнделікті киім тамаша үйлеседі.";
   };
 
   const activityScore = () => {
@@ -31,7 +31,7 @@ export function SmartInsights({ data }: { data: WeatherData }) {
       <Card className="glass-panel border-none">
         <CardHeader className="pb-2">
           <CardTitle className="text-sm font-medium text-muted-foreground flex items-center gap-2">
-            <Shirt className="w-4 h-4" /> What to Wear
+            <Shirt className="w-4 h-4" /> Не кию керек
           </CardTitle>
         </CardHeader>
         <CardContent>
@@ -42,14 +42,14 @@ export function SmartInsights({ data }: { data: WeatherData }) {
       <Card className="glass-panel border-none">
         <CardHeader className="pb-2">
           <CardTitle className="text-sm font-medium text-muted-foreground flex items-center gap-2">
-            <Sun className="w-4 h-4" /> Comfort Index
+            <Sun className="w-4 h-4" /> Жайлылық индексі
           </CardTitle>
         </CardHeader>
         <CardContent>
           <div className="flex items-center justify-between">
             <div className="text-3xl font-bold text-primary">{activityScore()}/100</div>
             <p className="text-sm text-muted-foreground">
-              {activityScore() > 80 ? "Perfect for outdoor activities!" : "Ideally suited for indoor plans."}
+              {activityScore() > 80 ? "Далада серуендеуге өте қолайлы!" : "Үйде қалу немесе жабық жерде жоспарлау ұсынылады."}
             </p>
           </div>
         </CardContent>

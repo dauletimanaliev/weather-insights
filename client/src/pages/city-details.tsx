@@ -102,8 +102,8 @@ export default function CityDetails() {
                   <Sparkles className="w-4 h-4" />
                 </div>
                 <div>
-                  <h3 className="font-medium text-sm">AI Assistant</h3>
-                  <p className="text-xs text-muted-foreground">Ask anything about the weather</p>
+                  <h3 className="font-medium text-sm">AI Көмекші</h3>
+                  <p className="text-xs text-muted-foreground">Ауа райы туралы кез келген нәрсені сұраңыз</p>
                 </div>
               </div>
               <Button 
@@ -112,7 +112,7 @@ export default function CityDetails() {
                 onClick={() => setChatOpen(!chatOpen)}
                 className="border-violet-500/20 hover:bg-violet-500/10"
               >
-                {chatOpen ? "Close" : "Ask AI"}
+                {chatOpen ? "Жабу" : "AI-дан сұрау"}
               </Button>
             </div>
 
@@ -135,7 +135,7 @@ export default function CityDetails() {
                       <Input
                         value={question}
                         onChange={(e) => setQuestion(e.target.value)}
-                        placeholder={`e.g., Is it good for a picnic in ${city?.name}?`}
+                        placeholder={`Мысалы: ${city?.name} қаласында пикник жасауға бола ма?`}
                         className="bg-white/50"
                         onKeyDown={(e) => e.key === "Enter" && handleAsk()}
                       />

@@ -49,7 +49,7 @@ export default function Home() {
             animate={{ opacity: 1, y: 0 }}
             className="text-4xl md:text-5xl font-display font-bold text-gradient"
           >
-            Weather Intelligence
+            Ақылды ауа райы
           </motion.h1>
           <motion.p 
             initial={{ opacity: 0, y: 20 }}
@@ -57,7 +57,7 @@ export default function Home() {
             transition={{ delay: 0.1 }}
             className="text-muted-foreground text-lg"
           >
-            Real-time forecasts and smart insights for your day.
+            Нақты уақыттағы болжамдар және күніңізге арналған ақылды кеңестер.
           </motion.p>
         </section>
 
@@ -68,7 +68,7 @@ export default function Home() {
             <Input
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              placeholder="Search for a city..."
+              placeholder="Қаланы іздеу..."
               className="pl-12 py-6 text-lg rounded-2xl shadow-lg border-border/50 focus:ring-primary/20 transition-all"
             />
           </div>
@@ -83,10 +83,10 @@ export default function Home() {
               >
                 {isSearching ? (
                   <div className="p-4 flex items-center justify-center text-muted-foreground">
-                    <Loader2 className="w-5 h-5 animate-spin mr-2" /> Searching...
+                    <Loader2 className="w-5 h-5 animate-spin mr-2" /> Іздеуде...
                   </div>
                 ) : results?.length === 0 ? (
-                  <div className="p-4 text-center text-muted-foreground">No cities found</div>
+                  <div className="p-4 text-center text-muted-foreground">Қала табылмады</div>
                 ) : (
                   <div className="max-h-[300px] overflow-y-auto">
                     {results?.map((city: any) => (
@@ -114,7 +114,7 @@ export default function Home() {
         {/* Saved Cities Grid */}
         <section>
           <div className="flex items-center justify-between mb-6">
-            <h2 className="text-xl font-display font-semibold">Your Locations</h2>
+            <h2 className="text-xl font-display font-semibold">Сіздің орындарыңыз</h2>
           </div>
 
           {isLoadingCities ? (
@@ -127,8 +127,8 @@ export default function Home() {
             <Card className="border-dashed border-2 border-muted bg-transparent">
               <CardContent className="flex flex-col items-center justify-center py-12 text-center">
                 <MapPin className="w-12 h-12 text-muted-foreground mb-4 opacity-50" />
-                <h3 className="font-medium text-lg">No locations saved</h3>
-                <p className="text-muted-foreground">Search for a city above to get started.</p>
+                <h3 className="font-medium text-lg">Сақталған орындар жоқ</h3>
+                <p className="text-muted-foreground">Бастау үшін жоғарыдағы қаланың атын жазыңыз.</p>
               </CardContent>
             </Card>
           ) : (
@@ -153,7 +153,7 @@ export default function Home() {
                         </div>
                       </div>
                       <div className="flex items-center text-sm font-medium text-primary">
-                        View Forecast <ArrowRight className="w-4 h-4 ml-1 transition-transform group-hover:translate-x-1" />
+                        Болжамды көру <ArrowRight className="w-4 h-4 ml-1 transition-transform group-hover:translate-x-1" />
                       </div>
                     </div>
                   </Link>

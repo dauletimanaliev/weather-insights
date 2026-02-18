@@ -20,10 +20,10 @@ export function CurrentWeather({ data, city }: WeatherCardProps) {
   };
 
   const getWeatherLabel = (code: number) => {
-    if (code <= 1) return "Sunny";
-    if (code <= 3) return "Cloudy";
-    if (code <= 67) return "Rainy";
-    return "Stormy";
+    if (code <= 1) return "Ашық";
+    if (code <= 3) return "Бұлтты";
+    if (code <= 67) return "Жаңбыр";
+    return "Дауыл";
   };
 
   return (
@@ -55,10 +55,10 @@ export function CurrentWeather({ data, city }: WeatherCardProps) {
           </div>
 
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-8">
-            <Metric icon={Wind} label="Wind" value={`${current.windSpeed} km/h`} />
-            <Metric icon={Droplets} label="Humidity" value={`${current.humidity}%`} />
-            <Metric icon={Umbrella} label="Precip." value={`${current.pressure} hPa`} />
-            <Metric icon={Eye} label="UV Index" value={current.uvIndex} />
+            <Metric icon={Wind} label="Жел" value={`${current.windSpeed} км/с`} />
+            <Metric icon={Droplets} label="Ылғалдылық" value={`${current.humidity}%`} />
+            <Metric icon={Umbrella} label="Жауын-шашын" value={`${current.pressure} гПа`} />
+            <Metric icon={Eye} label="УК индекс" value={current.uvIndex} />
           </div>
         </CardContent>
       </Card>

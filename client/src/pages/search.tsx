@@ -32,10 +32,10 @@ export default function SearchPage() {
   return (
     <Layout>
       <div className="max-w-2xl mx-auto py-8">
-        <h1 className="text-3xl font-display font-bold mb-6">Find Location</h1>
+        <h1 className="text-3xl font-display font-bold mb-6">Орынды табу</h1>
         
         <Input
-          placeholder="Type city name..."
+          placeholder="Қаланың атын енгізіңіз..."
           value={query}
           onChange={(e) => setQuery(e.target.value)}
           className="text-lg py-6 mb-8"
@@ -79,7 +79,7 @@ export default function SearchPage() {
             
             {query.length > 2 && results?.length === 0 && (
               <div className="text-center text-muted-foreground py-12">
-                No locations found for "{query}"
+                "{query}" үшін ешқандай орын табылмады
               </div>
             )}
           </div>
