@@ -21,7 +21,6 @@ export type City = typeof cities.$inferSelect;
 export type InsertCity = z.infer<typeof insertCitySchema>;
 
 // Types for the weather API responses (Open-Meteo) to ensure type safety in frontend
-// These aren't stored in DB, but used for API contract
 export const weatherSchema = z.object({
   current: z.object({
     temperature: z.number(),
@@ -50,14 +49,3 @@ export const weatherSchema = z.object({
 });
 
 export type WeatherData = z.infer<typeof weatherSchema>;
-
-// AI Assistant types
-export const assistantRequestSchema = z.object({
-  question: z.string(),
-  context: z.object({
-    city: z.string(),
-    weather: weatherSchema, 
-  }),
-});
-
-export type AssistantRequest = z.infer<typeof assistantRequestSchema>;

@@ -126,13 +126,5 @@ export async function registerRoutes(
       }
   });
 
-  // Assistant Endpoint (Simple rule-based for now as per "not AI magic")
-  app.post(api.assistant.chat.path, async (req, res) => {
-      // For now, return a placeholder or simple logic.
-      // The prompt says "not AI magic, but data processing + templates"
-      // We can implement this on the frontend mostly, but if we want backend:
-      res.json({ answer: "Мен сізге ауа райына байланысты далаға шығудың ең жақсы уақытын табуға көмектесе аламын!" });
-  });
-
   return httpServer;
 }
