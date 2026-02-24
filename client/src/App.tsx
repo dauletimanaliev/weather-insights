@@ -11,9 +11,14 @@ import SearchPage from "@/pages/search";
 function Router() {
   return (
     <Switch>
-      <Route path="/" component={Home} />
+      {/* Сначала конкретные */}
       <Route path="/search" component={SearchPage} />
       <Route path="/city/:id" component={CityDetails} />
+
+      {/* Потом корень */}
+      <Route path="/" component={Home} />
+
+      {/* И в конце 404 */}
       <Route component={NotFound} />
     </Switch>
   );

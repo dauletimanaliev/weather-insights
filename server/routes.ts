@@ -61,6 +61,12 @@ async function searchCities(query: string) {
 }
 
 import { seedDatabase } from "./seed";
+import OpenAI from "openai";
+
+const openai = new OpenAI({
+  apiKey: process.env.AI_INTEGRATIONS_OPENAI_API_KEY,
+  baseURL: process.env.AI_INTEGRATIONS_OPENAI_BASE_URL,
+});
 
 export async function registerRoutes(
   httpServer: Server,
@@ -68,6 +74,34 @@ export async function registerRoutes(
 ): Promise<Server> {
   // Seed database on startup
   await seedDatabase();
+
+  // Assistant Endpoint
+  app.post(api.assistant.chat.path, async (req, res) => {
+    try {
+      const { question, context } = api.assistant.chat.input.parse(req.body);
+      
+      const prompt = `You are a helpful weather assistant in a weather app. 
+The user is asking a question about the weather in ${context.city}.
+Current weather data: ${JSON.stringify(context.weather.current)}
+Daily forecast: ${JSON.stringify(context.weather.daily)}
+
+Please answer the user's question concisely in Kazakh. 
+If the question is not about weather or the app, politely decline and steer back to weather.
+
+User question: ${question}`;
+
+      const response = await openai.chat.completions.create({
+        model: "gpt-5.2",
+        messages: [{ role: "user", content: prompt }],
+        max_completion_tokens: 8192,
+      });
+
+      res.json({ answer: response.choices[0].message.content });
+    } catch (err) {
+      console.error("Assistant API Error:", err);
+      res.status(500).json({ message: "AI көмекшісі жауап бере алмады" });
+    }
+  });
 
   // Cities Endpoints
   app.get(api.cities.list.path, async (req, res) => {

@@ -1,13 +1,15 @@
+import { useState } from "react";
 import { Layout } from "@/components/layout";
 import { useParams, useLocation } from "wouter";
-import { useCities, useWeather } from "@/hooks/use-weather";
+import { useCities, useWeather, useWeatherAssistant } from "@/hooks/use-weather";
 import { CurrentWeather } from "@/components/weather-card";
 import { HourlyForecast, DailyForecast } from "@/components/forecast-charts";
 import { SmartInsights } from "@/components/smart-insights";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import { Skeleton } from "@/components/ui/skeleton";
-import { ChevronLeft, Loader2 } from "lucide-react";
-import { motion } from "framer-motion";
+import { ChevronLeft, Loader2, Send, Sparkles } from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
 
 export default function CityDetails() {
   const params = useParams();
@@ -18,6 +20,26 @@ export default function CityDetails() {
   const city = cities?.find(c => c.id === id);
 
   const { data: weather, isLoading: isLoadingWeather } = useWeather(city?.lat, city?.lon);
+
+  // AI Assistant State
+  const [chatOpen, setChatOpen] = useState(false);
+  const [question, setQuestion] = useState("");
+  const [answer, setAnswer] = useState("");
+  const assistant = useWeatherAssistant();
+
+  const handleAsk = async () => {
+    if (!question.trim() || !weather || !city) return;
+    try {
+      const response = await assistant.mutateAsync({
+        question,
+        context: { city: city.name, weather }
+      });
+      setAnswer(response.answer);
+      setQuestion("");
+    } catch (err) {
+      console.error(err);
+    }
+  };
 
   if (!city && !cities) {
     return (
@@ -70,6 +92,63 @@ export default function CityDetails() {
           >
             {/* Main Weather Card */}
             <CurrentWeather data={weather} city={city!.name} />
+
+            {/* AI Insight Bar */}
+            <div className="bg-gradient-to-r from-violet-500/10 to-purple-500/10 border border-violet-500/20 rounded-xl p-4 flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <div className="bg-violet-500 text-white p-2 rounded-lg">
+                  <Sparkles className="w-4 h-4" />
+                </div>
+                <div>
+                  <h3 className="font-medium text-sm">AI Көмекші</h3>
+                  <p className="text-xs text-muted-foreground">Ауа райы туралы кез келген нәрсені сұраңыз</p>
+                </div>
+              </div>
+              <Button 
+                size="sm" 
+                variant="outline" 
+                onClick={() => setChatOpen(!chatOpen)}
+                className="border-violet-500/20 hover:bg-violet-500/10"
+              >
+                {chatOpen ? "Жабу" : "AI-дан сұрау"}
+              </Button>
+            </div>
+
+            {/* AI Chat Area */}
+            <AnimatePresence>
+              {chatOpen && (
+                <motion.div
+                  initial={{ height: 0, opacity: 0 }}
+                  animate={{ height: "auto", opacity: 1 }}
+                  exit={{ height: 0, opacity: 0 }}
+                  className="overflow-hidden"
+                >
+                  <div className="glass-panel rounded-xl p-4 mb-4">
+                    {answer && (
+                      <div className="mb-4 bg-secondary/50 p-3 rounded-lg text-sm">
+                        {answer}
+                      </div>
+                    )}
+                    <div className="flex gap-2">
+                      <Input
+                        value={question}
+                        onChange={(e) => setQuestion(e.target.value)}
+                        placeholder={`Мысалы: ${city?.name} қаласында пикник жасауға бола ма?`}
+                        className="bg-white/50"
+                        onKeyDown={(e) => e.key === "Enter" && handleAsk()}
+                      />
+                      <Button 
+                        onClick={handleAsk} 
+                        disabled={assistant.isPending}
+                        className="bg-violet-600 hover:bg-violet-700"
+                      >
+                        {assistant.isPending ? <Loader2 className="w-4 h-4 animate-spin" /> : <Send className="w-4 h-4" />}
+                      </Button>
+                    </div>
+                  </div>
+                </motion.div>
+              )}
+            </AnimatePresence>
 
             {/* Charts & Insights */}
             <div className="grid lg:grid-cols-3 gap-6">

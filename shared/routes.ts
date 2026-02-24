@@ -82,6 +82,17 @@ export const api = {
             400: errorSchemas.validation
         }
     }
+  },
+  assistant: {
+    chat: {
+        method: 'POST' as const,
+        path: '/api/assistant/chat' as const,
+        input: assistantRequestSchema,
+        responses: {
+            200: z.object({ answer: z.string() }),
+            500: errorSchemas.internal
+        }
+    }
   }
 };
 

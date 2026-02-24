@@ -61,56 +61,7 @@ export default function Home() {
           </motion.p>
         </section>
 
-        {/* Search Section */}
-        <div className="relative z-10">
-          <div className="relative">
-            <Search className="absolute left-4 top-3.5 h-5 w-5 text-muted-foreground" />
-            <Input
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-              placeholder="Қаланы іздеу..."
-              className="pl-12 py-6 text-lg rounded-2xl shadow-lg border-border/50 focus:ring-primary/20 transition-all"
-            />
-          </div>
-
-          <AnimatePresence>
-            {search.length >= 2 && (
-              <motion.div
-                initial={{ opacity: 0, y: -10 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -10 }}
-                className="absolute top-full left-0 right-0 mt-2 bg-popover rounded-xl shadow-xl border border-border p-2 overflow-hidden"
-              >
-                {isSearching ? (
-                  <div className="p-4 flex items-center justify-center text-muted-foreground">
-                    <Loader2 className="w-5 h-5 animate-spin mr-2" /> Іздеуде...
-                  </div>
-                ) : results?.length === 0 ? (
-                  <div className="p-4 text-center text-muted-foreground">Қала табылмады</div>
-                ) : (
-                  <div className="max-h-[300px] overflow-y-auto">
-                    {results?.map((city: any) => (
-                      <button
-                        key={city.id}
-                        onClick={() => handleSelectCity(city)}
-                        className="w-full text-left p-3 hover:bg-accent hover:text-accent-foreground rounded-lg transition-colors flex items-center justify-between group"
-                      >
-                        <div>
-                          <div className="font-medium">{city.name}</div>
-                          <div className="text-xs text-muted-foreground">
-                            {[city.admin1, city.country].filter(Boolean).join(", ")}
-                          </div>
-                        </div>
-                        <ArrowRight className="w-4 h-4 opacity-0 group-hover:opacity-100 transition-opacity" />
-                      </button>
-                    ))}
-                  </div>
-                )}
-              </motion.div>
-            )}
-          </AnimatePresence>
-        </div>
-
+    
         {/* Saved Cities Grid */}
         <section>
           <div className="flex items-center justify-between mb-6">
