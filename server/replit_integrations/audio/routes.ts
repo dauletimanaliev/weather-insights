@@ -62,7 +62,7 @@ export function registerAudioRoutes(app: Express): void {
   // Uses gpt-4o-mini-transcribe for STT, gpt-audio for voice response
   app.post("/api/conversations/:id/messages", audioBodyParser, async (req: Request, res: Response) => {
     try {
-      const conversationId = parseInt(req.params.id);
+      const conversationId = parseInt(req.params.id as string);
       const { audio, voice = "alloy" } = req.body;
 
       if (!audio) {
