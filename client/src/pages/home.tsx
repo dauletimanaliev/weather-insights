@@ -99,8 +99,10 @@ export default function Home() {
                           <h3 className="font-bold text-lg">{city.name}</h3>
                           <p className="text-sm text-muted-foreground">{city.country}</p>
                         </div>
-                        <div className="bg-primary/10 p-2 rounded-full text-primary">
-                          <MapPin className="w-4 h-4" />
+                        <div className="flex items-center gap-2">
+                          <div className="bg-primary/10 p-2 rounded-full text-primary">
+                            <MapPin className="w-4 h-4" />
+                          </div>
                         </div>
                       </div>
                       <div className="flex items-center text-sm font-medium text-primary">

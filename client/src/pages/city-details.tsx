@@ -123,26 +123,30 @@ export default function CityDetails() {
                   exit={{ height: 0, opacity: 0 }}
                   className="overflow-hidden"
                 >
-                  <div className="glass-panel rounded-xl p-4 mb-4">
+                  <div className="glass-panel rounded-xl p-6 mb-4 shadow-lg border-violet-500/10">
                     {answer && (
-                      <div className="mb-4 bg-secondary/50 p-3 rounded-lg text-sm">
+                      <div className="mb-6 bg-violet-500/5 border border-violet-500/10 p-4 rounded-xl text-sm leading-relaxed">
+                        <div className="flex items-center gap-2 mb-2 text-violet-600 font-semibold">
+                          <Sparkles className="w-4 h-4" />
+                          AI Жауабы:
+                        </div>
                         {answer}
                       </div>
                     )}
-                    <div className="flex gap-2">
+                    <div className="flex gap-3">
                       <Input
                         value={question}
                         onChange={(e) => setQuestion(e.target.value)}
                         placeholder={`Мысалы: ${city?.name} қаласында пикник жасауға бола ма?`}
-                        className="bg-white/50"
+                        className="bg-white/50 py-6 px-4 text-base focus-visible:ring-violet-500"
                         onKeyDown={(e) => e.key === "Enter" && handleAsk()}
                       />
                       <Button 
                         onClick={handleAsk} 
                         disabled={assistant.isPending}
-                        className="bg-violet-600 hover:bg-violet-700"
+                        className="bg-violet-600 hover:bg-violet-700 h-auto px-6"
                       >
-                        {assistant.isPending ? <Loader2 className="w-4 h-4 animate-spin" /> : <Send className="w-4 h-4" />}
+                        {assistant.isPending ? <Loader2 className="w-5 h-5 animate-spin" /> : <Send className="w-5 h-5" />}
                       </Button>
                     </div>
                   </div>
