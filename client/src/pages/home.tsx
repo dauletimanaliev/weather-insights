@@ -99,10 +99,24 @@ export default function Home() {
                           <h3 className="font-bold text-lg">{city.name}</h3>
                           <p className="text-sm text-muted-foreground">{city.country}</p>
                         </div>
-                        <div className="flex items-center gap-2">
+                        <div className="flex flex-col items-center gap-2">
                           <div className="bg-primary/10 p-2 rounded-full text-primary">
                             <MapPin className="w-4 h-4" />
                           </div>
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            className="h-8 w-8 text-destructive hover:text-destructive hover:bg-destructive/10"
+                            onClick={(e) => {
+                              e.preventDefault();
+                              e.stopPropagation();
+                              if (confirm("Бұл қаланы өшіруді растайсыз ба?")) {
+                                deleteCity.mutate(city.id);
+                              }
+                            }}
+                          >
+                            <Trash2 className="w-4 h-4" />
+                          </Button>
                         </div>
                       </div>
                       <div className="flex items-center text-sm font-medium text-primary">
