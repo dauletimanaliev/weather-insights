@@ -1,15 +1,14 @@
-import { useState } from "react";
 import { Layout } from "@/components/layout";
 import { useParams, useLocation } from "wouter";
-import { useCities, useWeather, useWeatherAssistant } from "@/hooks/use-weather";
+import { useCities, useWeather, getWeatherThemeClass, useAirQuality } from "@/hooks/use-weather";
 import { CurrentWeather } from "@/components/weather-card";
 import { HourlyForecast, DailyForecast } from "@/components/forecast-charts";
 import { SmartInsights } from "@/components/smart-insights";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { Skeleton } from "@/components/ui/skeleton";
-import { ChevronLeft, Loader2, Send, Sparkles } from "lucide-react";
-import { motion, AnimatePresence } from "framer-motion";
+import { ChevronLeft, Loader2, Sparkles, Wind, Droplets, Activity, Thermometer, Gauge, Sun } from "lucide-react";
+import { motion } from "framer-motion";
+import { ActivityScore } from "@/components/activity-score";
 
 export default function CityDetails() {
   const params = useParams();
@@ -20,26 +19,9 @@ export default function CityDetails() {
   const city = cities?.find(c => c.id === id);
 
   const { data: weather, isLoading: isLoadingWeather } = useWeather(city?.lat, city?.lon);
+  const { data: aqi } = useAirQuality(city?.lat || "", city?.lon || "");
 
-  // AI Assistant State
-  const [chatOpen, setChatOpen] = useState(false);
-  const [question, setQuestion] = useState("");
-  const [answer, setAnswer] = useState("");
-  const assistant = useWeatherAssistant();
-
-  const handleAsk = async () => {
-    if (!question.trim() || !weather || !city) return;
-    try {
-      const response = await assistant.mutateAsync({
-        question,
-        context: { city: city.name, weather }
-      });
-      setAnswer(response.answer);
-      setQuestion("");
-    } catch (err) {
-      console.error(err);
-    }
-  };
+  const themeClass = weather ? getWeatherThemeClass(weather.current.weatherCode) : "";
 
   if (!city && !cities) {
     return (
@@ -57,8 +39,9 @@ export default function CityDetails() {
   }
 
   return (
-    <Layout>
-      <div className="space-y-6">
+    <div className={`min-h-screen transition-colors duration-700 ${themeClass}`}>
+      <Layout>
+        <div className="space-y-6">
         {/* Header */}
         <div className="flex items-center gap-4 mb-6">
           <Button 
@@ -93,71 +76,103 @@ export default function CityDetails() {
             {/* Main Weather Card */}
             <CurrentWeather data={weather} city={city!.name} />
 
-            {/* AI Insight Bar */}
-            <div className="bg-gradient-to-r from-violet-500/10 to-purple-500/10 border border-violet-500/20 rounded-xl p-4 flex items-center justify-between">
-              <div className="flex items-center gap-3">
-                <div className="bg-violet-500 text-white p-2 rounded-lg">
-                  <Sparkles className="w-4 h-4" />
-                </div>
-                <div>
-                  <h3 className="font-medium text-sm">AI Көмекші</h3>
-                  <p className="text-xs text-muted-foreground">Ауа райы туралы кез келген нәрсені сұраңыз</p>
-                </div>
-              </div>
-              <Button 
-                size="sm" 
-                variant="outline" 
-                onClick={() => setChatOpen(!chatOpen)}
-                className="border-violet-500/20 hover:bg-violet-500/10"
-              >
-                {chatOpen ? "Жабу" : "AI-дан сұрау"}
-              </Button>
-            </div>
-
-            {/* AI Chat Area */}
-            <AnimatePresence>
-              {chatOpen && (
-                <motion.div
-                  initial={{ height: 0, opacity: 0 }}
-                  animate={{ height: "auto", opacity: 1 }}
-                  exit={{ height: 0, opacity: 0 }}
-                  className="overflow-hidden"
-                >
-                  <div className="glass-panel rounded-xl p-6 mb-4 shadow-lg border-violet-500/10">
-                    {answer && (
-                      <div className="mb-6 bg-violet-500/5 border border-violet-500/10 p-4 rounded-xl text-sm leading-relaxed">
-                        <div className="flex items-center gap-2 mb-2 text-violet-600 font-semibold">
-                          <Sparkles className="w-4 h-4" />
-                          AI Жауабы:
-                        </div>
-                        {answer}
-                      </div>
-                    )}
-                    <div className="flex gap-3">
-                      <Input
-                        value={question}
-                        onChange={(e) => setQuestion(e.target.value)}
-                        placeholder={`Мысалы: ${city?.name} қаласында пикник жасауға бола ма?`}
-                        className="bg-white/50 py-6 px-4 text-base focus-visible:ring-violet-500"
-                        onKeyDown={(e) => e.key === "Enter" && handleAsk()}
-                      />
-                      <Button 
-                        onClick={handleAsk} 
-                        disabled={assistant.isPending}
-                        className="bg-violet-600 hover:bg-violet-700 h-auto px-6"
-                      >
-                        {assistant.isPending ? <Loader2 className="w-5 h-5 animate-spin" /> : <Send className="w-5 h-5" />}
-                      </Button>
-                    </div>
-                  </div>
-                </motion.div>
-              )}
-            </AnimatePresence>
-
             {/* Charts & Insights */}
             <div className="grid lg:grid-cols-3 gap-6">
               <div className="lg:col-span-2 space-y-6">
                 <HourlyForecast data={weather} />
+                
+                {/* Technical Details Grid */}
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                  <motion.div 
+                    initial={{ opacity: 0, scale: 0.95 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    className="glass-panel rounded-3xl p-6 flex items-center gap-4"
+                  >
+                    <div className="bg-blue-500/10 p-3 rounded-2xl text-blue-500">
+                      <Droplets className="w-6 h-6" />
+                    </div>
+                    <div>
+                      <p className="text-xs text-muted-foreground">Ылғалдылық</p>
+                      <p className="text-xl font-bold">{weather.current.humidity}%</p>
+                    </div>
+                  </motion.div>
+                  
+                  <motion.div 
+                    initial={{ opacity: 0, scale: 0.95 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    transition={{ delay: 0.1 }}
+                    className="glass-panel rounded-3xl p-6 flex items-center gap-4"
+                  >
+                    <div className="bg-orange-500/10 p-3 rounded-2xl text-orange-500">
+                      <Sun className="w-6 h-6" />
+                    </div>
+                    <div>
+                      <p className="text-xs text-muted-foreground">УК Индекс</p>
+                      <p className="text-xl font-bold">{weather.current.uvIndex}</p>
+                    </div>
+                  </motion.div>
+
+                  <motion.div 
+                    initial={{ opacity: 0, scale: 0.95 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    transition={{ delay: 0.2 }}
+                    className="glass-panel rounded-3xl p-6 flex items-center gap-4"
+                  >
+                    <div className="bg-emerald-500/10 p-3 rounded-2xl text-emerald-500">
+                      <Gauge className="w-6 h-6" />
+                    </div>
+                    <div>
+                      <p className="text-xs text-muted-foreground">Қысым</p>
+                      <p className="text-xl font-bold">{Math.round(weather.current.pressure)} <span className="text-xs font-normal">hPa</span></p>
+                    </div>
+                  </motion.div>
+                </div>
+
+                {/* Activity Score Card */}
+                <ActivityScore data={weather} />
+                
+                {/* Air Quality Index Card */}
+                {aqi && (
+                  <motion.div 
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    className="glass-panel rounded-3xl p-6 border-white/20"
+                  >
+                    <div className="flex items-center gap-2 mb-6 text-primary">
+                      <Activity className="w-5 h-5" />
+                      <h3 className="font-semibold">Ауа сапасы (AQI)</h3>
+                    </div>
+                    <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                      <div className="bg-white/30 dark:bg-black/20 p-4 rounded-2xl">
+                        <p className="text-xs text-muted-foreground mb-1">PM2.5</p>
+                        <p className="text-xl font-bold">{aqi.pm2_5} <span className="text-xs font-normal">µg/m³</span></p>
+                      </div>
+                      <div className="bg-white/30 dark:bg-black/20 p-4 rounded-2xl">
+                        <p className="text-xs text-muted-foreground mb-1">PM10</p>
+                        <p className="text-xl font-bold">{aqi.pm10} <span className="text-xs font-normal">µg/m³</span></p>
+                      </div>
+                      <div className="bg-white/30 dark:bg-black/20 p-4 rounded-2xl">
+                        <p className="text-xs text-muted-foreground mb-1">Озон (O₃)</p>
+                        <p className="text-xl font-bold">{Math.round(aqi.ozone)} <span className="text-xs font-normal">µg/m³</span></p>
+                      </div>
+                      <div className="bg-white/30 dark:bg-black/20 p-4 rounded-2xl">
+                        <p className="text-xs text-muted-foreground mb-1">NO₂</p>
+                        <p className="text-xl font-bold">{Math.round(aqi.nitrogen_dioxide)} <span className="text-xs font-normal">µg/m³</span></p>
+                      </div>
+                    </div>
+                    <div className="mt-6 flex items-start gap-3 p-4 bg-primary/5 rounded-2xl border border-primary/10">
+                      <Sparkles className="w-5 h-5 text-primary shrink-0 mt-0.5" />
+                      <p className="text-sm text-muted-foreground">
+                        {aqi.pm2_5 < 12 
+                          ? "Ауа сапасы тамаша! Бүгін таза ауада серуендеуге өте қолайлы уақыт." 
+                          : aqi.pm2_5 < 35 
+                          ? "Ауа сапасы қанағаттанарлық. Сезімтал адамдарға сақ болу ұсынылады." 
+                          : "Ауа сапасы төмен. Далаға шыққанда бетперде киген жөн немесе үйде болыңыз."}
+                      </p>
+                    </div>
+                  </motion.div>
+                )}
+
                 <SmartInsights data={weather} />
               </div>
               <div className="lg:col-span-1">
@@ -171,6 +186,7 @@ export default function CityDetails() {
           </div>
         )}
       </div>
-    </Layout>
+      </Layout>
+    </div>
   );
 }

@@ -1,5 +1,5 @@
 import { Link, useLocation } from "wouter";
-import { CloudSun, Home, MapPin, Search } from "lucide-react";
+import { CloudSun, Home, MapPin, Search, Trophy } from "lucide-react";
 
 export function Layout({ children }: { children: React.ReactNode }) {
   const [location] = useLocation();
@@ -7,6 +7,7 @@ export function Layout({ children }: { children: React.ReactNode }) {
   const navItems = [
     { href: "/", label: "Басты бет", icon: Home },
     { href: "/search", label: "Іздеу", icon: Search },
+    { href: "/sport", label: "Спорт", icon: Trophy },
   ];
 
   return (

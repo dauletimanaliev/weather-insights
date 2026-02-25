@@ -124,17 +124,6 @@ export default function Home() {
                       </div>
                     </div>
                   </Link>
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    className="absolute top-4 right-4 opacity-0 group-hover:opacity-100 transition-opacity text-muted-foreground hover:text-destructive"
-                    onClick={(e) => {
-                      e.preventDefault();
-                      deleteCity.mutate(city.id);
-                    }}
-                  >
-                    <Trash2 className="w-4 h-4" />
-                  </Button>
                 </motion.div>
               ))}
             </div>
