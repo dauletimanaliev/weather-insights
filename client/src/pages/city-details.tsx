@@ -9,6 +9,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { ChevronLeft, Loader2, Sparkles, Wind, Droplets, Activity, Thermometer, Gauge, Sun } from "lucide-react";
 import { motion } from "framer-motion";
 import { ActivityScore } from "@/components/activity-score";
+import { Accordion, AccordionItem, AccordionTrigger, AccordionContent } from "@/components/ui/accordion";
 
 export default function CityDetails() {
   const params = useParams();
@@ -174,6 +175,64 @@ export default function CityDetails() {
                 )}
 
                 <SmartInsights data={weather} />
+
+                {/* City Specific FAQ Accordion */}
+                {city && (
+                  <motion.div
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    className="glass-panel rounded-3xl p-6 border-white/20"
+                  >
+                    <h3 className="font-semibold text-lg mb-4 text-primary">Жиі қойылатын сұрақтар ({city?.name} қаласы бойынша)</h3>
+                    <Accordion type="single" collapsible className="w-full">
+                      <AccordionItem value="q1">
+                        <AccordionTrigger className="text-left font-medium">Қазір не киіп шыққан дұрыс?</AccordionTrigger>
+                        <AccordionContent className="text-muted-foreground leading-relaxed">
+                          {(()=>{
+                            const t = Math.round(weather.current.temperature);
+                            const isRaining = [51, 53, 55, 61, 63, 65, 80, 81, 82].includes(weather.current.weatherCode);
+                            if(t < 0) return "Аяз бар. Қалың куртка, бөрік және қолғап киюді ұсынамыз.";
+                            if(t < 10) return "Күн салқын. Жылы күрте немесе пальто кигеніңіз дұрыс.";
+                            if(t < 20) return "Ауа райы қолайлы. Жемпір немесе жеңіл куртка жеткілікті.";
+                            return "Күн жылы. Жеңіл киім жарайды." + (isRaining ? " Қолшатыр алуды ұмытпаңыз!" : "");
+                          })()}
+                        </AccordionContent>
+                      </AccordionItem>
+
+                      <AccordionItem value="q2">
+                        <AccordionTrigger className="text-left font-medium">Серуендеуге бола ма?</AccordionTrigger>
+                        <AccordionContent className="text-muted-foreground leading-relaxed">
+                          {(()=>{
+                            const t = Math.round(weather.current.temperature);
+                            const isRaining = [51, 53, 55, 61, 63, 65, 80, 81, 82].includes(weather.current.weatherCode);
+                            const isSnowing = [71, 73, 75, 77, 85, 86].includes(weather.current.weatherCode);
+                            const wSpeed = Math.round(weather.current.windSpeed);
+                            
+                            if(isRaining) return "Жаңбыр жауып тұр, қолшатыр алғаныңыз жөн.";
+                            if(isSnowing) return "Қар жауып тұр, дала өте әдемі, бірақ жылы киініңіз.";
+                            if(t < -10) return "Күн тым суық, ұзақ серуендеуді ұсынбаймыз.";
+                            if(wSpeed > 30) return "Жел өте күшті, абай болыңыз.";
+                            return "Ауа райы серуендеуге тамаша!";
+                          })()}
+                        </AccordionContent>
+                      </AccordionItem>
+
+                      <AccordionItem value="q3" className="border-b-0">
+                        <AccordionTrigger className="text-left font-medium">{city?.name} қаласындағы қазіргі ауа райы?</AccordionTrigger>
+                        <AccordionContent className="text-muted-foreground leading-relaxed">
+                          {(()=>{
+                            const t = Math.round(weather.current.temperature);
+                            const isRaining = [51, 53, 55, 61, 63, 65, 80, 81, 82].includes(weather.current.weatherCode);
+                            const isSnowing = [71, 73, 75, 77, 85, 86].includes(weather.current.weatherCode);
+                            const wSpeed = Math.round(weather.current.windSpeed);
+                            const conditionStr = isRaining ? "Жаңбыр жауып тұр" : isSnowing ? "Қар жауып тұр" : "Жауын-шашынсыз ашық";
+                            return `Қазір температура ${t}°C, жел жылдамдығы ${wSpeed} км/сағ. ${conditionStr}.`;
+                          })()}
+                        </AccordionContent>
+                      </AccordionItem>
+                    </Accordion>
+                  </motion.div>
+                )}
               </div>
               <div className="lg:col-span-1">
                 <DailyForecast data={weather} />
