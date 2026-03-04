@@ -9,10 +9,12 @@ import Home from "@/pages/home";
 import CityDetails from "@/pages/city-details";
 import SearchPage from "@/pages/search";
 import SportPage from "@/pages/sport";
+import { FaqChat } from "@/components/faq-chat";
 
 function Router() {
   return (
     <WouterRouter hook={useHashLocation}>
+      <FaqChat />
       <Switch>
         {/* Сначала конкретные */}
         <Route path="/search" component={SearchPage} />
