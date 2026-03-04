@@ -1,9 +1,11 @@
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect, useMemo } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { MessageCircle, X, Send, User, Bot, HelpCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { useRoute } from "wouter";
+import { useCities, useWeather } from "@/hooks/use-weather";
 
 // Predefined FAQ Data (Kazakh)
 type CategoryId = "all" | "general" | "weather" | "cities";
@@ -68,7 +70,7 @@ type Message = {
 
 export function FaqChat() {
   const [isOpen, setIsOpen] = useState(false);
-  const [activeCategory, setActiveCategory] = useState<CategoryId>("all");
+  const [activeCategory, setActiveCategory] = useState<string>("all");
   const [messages, setMessages] = useState<Message[]>([
     {
       id: "welcome",
@@ -78,6 +80,60 @@ export function FaqChat() {
   ]);
   const [isTyping, setIsTyping] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
+
+  const [match, params] = useRoute("/city/:id");
+  const cityId = match ? Number(params?.id) : null;
+  const { data: cities } = useCities();
+  const city = cities?.find(c => c.id === cityId);
+  const { data: weather } = useWeather(city?.lat, city?.lon);
+
+  const dynamicCategories = useMemo(() => {
+    if (city) {
+      return [...categories, { id: "this_city", label: city.name }];
+    }
+    return categories;
+  }, [city]);
+
+  const allFaqs = useMemo(() => {
+    let list = [...faqs];
+    
+    if (city && weather) {
+       const temp = Math.round(weather.current.temperature);
+       const isRaining = [51, 53, 55, 61, 63, 65, 80, 81, 82].includes(weather.current.weatherCode);
+       const isSnowing = [71, 73, 75, 77, 85, 86].includes(weather.current.weatherCode);
+       const windSpeed = Math.round(weather.current.windSpeed);
+       const conditionStr = isRaining ? "Жаңбыр жауып тұр" : isSnowing ? "Қар жауып тұр" : "Жауын-шашынсыз ашық";
+
+       list.push({
+         id: "city_weather",
+         categoryId: "this_city",
+         question: `${city.name} қаласындағы қазіргі ауа райы?`,
+         answer: `Қазір ${city.name} қаласында температура ${temp}°C, жел жылдамдығы ${windSpeed} км/сағ. ${conditionStr}.`,
+       });
+
+       list.push({
+         id: "city_clothing",
+         categoryId: "this_city",
+         question: "Қазір не киіп шыққан дұрыс?",
+         answer: temp < 0 ? "Аяз бар. Қалың куртка, бөрік және қолғап киюді ұсынамыз." : 
+                 temp < 10 ? "Күн салқын. Жылы күрте немесе пальто кигеніңіз дұрыс." :
+                 temp < 20 ? "Ауа райы қолайлы. Жемпір немесе жеңіл куртка жеткілікті." :
+                 "Күн жылы. Жеңіл киім жарайды." + (isRaining ? " Қолшатыр алуды ұмытпаңыз!" : "")
+       });
+       
+       list.push({
+         id: "city_walk",
+         categoryId: "this_city",
+         question: "Серуендеуге бола ма?",
+         answer: isRaining ? "Жаңбыр жауып тұр, қолшатыр алғаныңыз жөн." :
+                 isSnowing ? "Қар жауып тұр, дала өте әдемі, бірақ жылы киініңіз." :
+                 temp < -10 ? "Күн тым суық, ұзақ серуендеуді ұсынбаймыз." :
+                 windSpeed > 30 ? "Жел өте күшті, абай болыңыз." :
+                 "Ауа райы серуендеуге тамаша!"
+       });
+    }
+    return list;
+  }, [city, weather]);
 
   // Auto-scroll to bottom of messages
   useEffect(() => {
@@ -100,7 +156,7 @@ export function FaqChat() {
     }, 600);
   };
 
-  const filteredFaqs = faqs.filter(faq => activeCategory === "all" || faq.categoryId === activeCategory);
+  const filteredFaqs = allFaqs.filter(faq => activeCategory === "all" || faq.categoryId === activeCategory);
 
   return (
     <>
@@ -196,7 +252,7 @@ export function FaqChat() {
             {/* FAQ Categories Select */}
             <div className="px-4 py-2 bg-muted/20 border-t border-border/50">
                <div className="flex overflow-x-auto pb-2 gap-2 scrollbar-none" style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
-                  {categories.map((cat) => (
+                  {dynamicCategories.map((cat) => (
                     <Button
                       key={cat.id}
                       variant="outline"
@@ -206,7 +262,7 @@ export function FaqChat() {
                           ? "bg-primary text-primary-foreground hover:bg-primary/90 hover:text-primary-foreground border-primary"
                           : "bg-background/50 hover:bg-muted text-muted-foreground"
                       }`}
-                      onClick={() => setActiveCategory(cat.id as CategoryId)}
+                      onClick={() => setActiveCategory(cat.id)}
                     >
                       {cat.label}
                     </Button>
