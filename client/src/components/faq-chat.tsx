@@ -27,6 +27,21 @@ const faqs = [
     question: "Ауа райы қаншалықты жиі жаңарады?",
     answer: "Ауа райы деректері сіз бетті жаңартқан сайын немесе жаңа қалаға кірген кезде автоматты түрде жаңарады.",
   },
+  {
+    id: "uv_index",
+    question: "УК (Ультракүлгін) индексі деген не?",
+    answer: "УК индексі күн сәулесінің радиация деңгейін көрсетеді. Индекс жоғары болса (әдетте 3-тен жоғары), күннен қорғайтын крем (SPF) жағуды ұсынамыз.",
+  },
+  {
+    id: "weather_charts",
+    question: "Температура графигін қалай түсінемін?",
+    answer: "Иә, қала парақшасына кірген соң төменгі жағында бір күндік және 7 күндік ауа райы графиктері бар. Ондағы көк сызықтар жауын-шашын мөлшерін, ал қызыл/сары сызықтар температураны білдіреді.",
+  },
+  {
+    id: "clothing_advice",
+    question: "Киім таңдауға ұсыныстар бар ма?",
+    answer: "Әрине! Басты беттегі 'Ақылды кеңестер' бөлімі ағымдағы ауа райына қарай қандай киім үлгісі сәйкес келетінін көрсетеді.",
+  }
 ];
 
 type Message = {
@@ -41,7 +56,7 @@ export function FaqChat() {
     {
       id: "welcome",
       sender: "bot",
-      text: "Сәлеметсіз бе! Мен SkyCast көмекшісімін. Қандай сұрағыңыз бар?",
+      text: "Сәлеметсіз бе! Мен SkyCast көмекшісімін. Ауа райына және функционалға байланысты сұрағыңыз бар ма?",
     }
   ]);
   const [isTyping, setIsTyping] = useState(false);
@@ -83,9 +98,9 @@ export function FaqChat() {
             <Button
               onClick={() => setIsOpen(true)}
               size="icon"
-              className="h-14 w-14 rounded-full shadow-lg hover:shadow-xl transition-all duration-300 bg-gradient-to-r from-primary to-accent hover:opacity-90"
+              className="h-16 w-16 rounded-full shadow-lg hover:shadow-xl transition-all duration-300 bg-gradient-to-r from-primary to-accent hover:opacity-90"
             >
-              <MessageCircle className="h-6 w-6 text-primary-foreground" />
+              <MessageCircle className="h-7 w-7 text-primary-foreground" />
             </Button>
           </motion.div>
         )}
@@ -99,7 +114,7 @@ export function FaqChat() {
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 20, scale: 0.95 }}
             transition={{ duration: 0.2 }}
-            className="fixed bottom-24 md:bottom-8 right-4 md:right-8 z-50 w-[calc(100vw-2rem)] md:w-96 max-w-sm h-[500px] max-h-[70vh] flex flex-col shadow-2xl rounded-2xl overflow-hidden glass-panel border border-border/50 bg-background/80 backdrop-blur-xl"
+            className="fixed bottom-24 md:bottom-8 right-4 md:right-8 z-50 w-[calc(100vw-2rem)] md:w-[28rem] max-w-lg h-[650px] max-h-[85vh] flex flex-col shadow-2xl rounded-2xl overflow-hidden glass-panel border border-border/50 bg-background/80 backdrop-blur-xl"
           >
             {/* Header */}
             <div className="bg-gradient-to-r from-primary to-accent p-4 flex items-center justify-between text-primary-foreground">
