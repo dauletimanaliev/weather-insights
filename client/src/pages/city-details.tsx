@@ -6,10 +6,16 @@ import { HourlyForecast, DailyForecast } from "@/components/forecast-charts";
 import { SmartInsights } from "@/components/smart-insights";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
-import { ChevronLeft, Loader2, Sparkles, Wind, Droplets, Activity, Thermometer, Gauge, Sun } from "lucide-react";
-import { motion } from "framer-motion";
+import { ChevronLeft, Loader2, Sparkles, Wind, Droplets, Activity, Thermometer, Gauge, Sun, MessageCircle, User, Bot } from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
 import { ActivityScore } from "@/components/activity-score";
-import { Accordion, AccordionItem, AccordionTrigger, AccordionContent } from "@/components/ui/accordion";
+import { useState, useRef, useEffect } from "react";
+
+type Message = {
+  id: string;
+  sender: "user" | "bot";
+  text: string;
+};
 
 export default function CityDetails() {
   const params = useParams();
@@ -21,6 +27,31 @@ export default function CityDetails() {
 
   const { data: weather, isLoading: isLoadingWeather } = useWeather(city?.lat, city?.lon);
   const { data: aqi } = useAirQuality(city?.lat || "", city?.lon || "");
+
+  const [messages, setMessages] = useState<Message[]>([
+    {
+      id: "welcome",
+      sender: "bot",
+      text: `Сәлеметсіз бе! Мен ${city?.name || "осы қала"} бойынша көмекшіңізбін. Қазіргі ауа райына байланысты сұрағыңыз бар ма?`
+    }
+  ]);
+  const [isTyping, setIsTyping] = useState(false);
+  const scrollRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (scrollRef.current) {
+      scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
+    }
+  }, [messages, isTyping]);
+
+  const handleQuestionSelect = (question: string, getAnswer: () => string) => {
+    setMessages(prev => [...prev, { id: Date.now().toString(), sender: "user", text: question }]);
+    setIsTyping(true);
+    setTimeout(() => {
+      setIsTyping(false);
+      setMessages(prev => [...prev, { id: (Date.now() + 1).toString(), sender: "bot", text: getAnswer() }]);
+    }, 600);
+  };
 
   const themeClass = weather ? getWeatherThemeClass(weather.current.weatherCode) : "";
 
@@ -129,6 +160,122 @@ export default function CityDetails() {
                   </motion.div>
                 </div>
 
+                {/* City Specific Inline FAQ Chat */}
+                {city && (
+                  <motion.div
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    className="glass-panel rounded-3xl flex flex-col border-white/20 overflow-hidden relative min-h-[400px]"
+                  >
+                    {/* Header */}
+                    <div className="p-4 border-b border-white/10 flex items-center gap-3 bg-white/5">
+                      <div className="w-10 h-10 rounded-full bg-primary/20 flex items-center justify-center text-primary">
+                        <MessageCircle className="w-5 h-5" />
+                      </div>
+                      <div>
+                        <h3 className="font-semibold text-foreground">Сұрақ-жауап ({city.name})</h3>
+                        <p className="text-xs text-muted-foreground">Жергілікті ауа райы бойынша кеңес</p>
+                      </div>
+                    </div>
+
+                    {/* Chat Messages */}
+                    <div 
+                      ref={scrollRef}
+                      className="flex-1 p-4 overflow-y-auto space-y-4 max-h-[300px] scrollbar-thin overflow-x-hidden"
+                    >
+                      {messages.map((msg) => (
+                        <motion.div
+                          key={msg.id}
+                          initial={{ opacity: 0, y: 10 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          className={`flex gap-3 ${msg.sender === "user" ? "flex-row-reverse" : "flex-row"}`}
+                        >
+                          <div className={`w-8 h-8 rounded-full flex items-center justify-center shrink-0 ${
+                            msg.sender === "user" ? "bg-primary text-primary-foreground" : "bg-muted text-muted-foreground"
+                          }`}>
+                            {msg.sender === "user" ? <User className="w-4 h-4" /> : <Bot className="w-4 h-4" />}
+                          </div>
+                          <div className={`px-4 py-2.5 rounded-2xl max-w-[85%] text-sm ${
+                            msg.sender === "user"
+                              ? "bg-primary text-primary-foreground rounded-tr-sm"
+                              : "bg-muted text-foreground rounded-tl-sm border border-border/50"
+                          }`}>
+                            {msg.text}
+                          </div>
+                        </motion.div>
+                      ))}
+                      {isTyping && (
+                        <motion.div
+                          initial={{ opacity: 0 }}
+                          animate={{ opacity: 1 }}
+                          className="flex gap-3"
+                        >
+                          <div className="w-8 h-8 rounded-full bg-muted flex items-center justify-center text-muted-foreground shrink-0">
+                            <Bot className="w-4 h-4" />
+                          </div>
+                          <div className="px-4 py-3 rounded-2xl rounded-tl-sm bg-muted border border-border/50 flex gap-1">
+                            <motion.span animate={{ y: [0, -5, 0] }} transition={{ repeat: Infinity, duration: 0.6 }} className="w-1.5 h-1.5 bg-muted-foreground/50 rounded-full" />
+                            <motion.span animate={{ y: [0, -5, 0] }} transition={{ repeat: Infinity, duration: 0.6, delay: 0.2 }} className="w-1.5 h-1.5 bg-muted-foreground/50 rounded-full" />
+                            <motion.span animate={{ y: [0, -5, 0] }} transition={{ repeat: Infinity, duration: 0.6, delay: 0.4 }} className="w-1.5 h-1.5 bg-muted-foreground/50 rounded-full" />
+                          </div>
+                        </motion.div>
+                      )}
+                    </div>
+
+                    {/* Question Actions */}
+                    <div className="p-4 bg-muted/20 border-t border-white/10 flex flex-wrap gap-2">
+                       <Button
+                          variant="outline"
+                          size="sm"
+                          className="rounded-full text-xs font-medium bg-background/50 hover:bg-muted"
+                          onClick={() => handleQuestionSelect("Қазір не киіп шыққан дұрыс?", () => {
+                            const t = Math.round(weather.current.temperature);
+                            const isRaining = [51, 53, 55, 61, 63, 65, 80, 81, 82].includes(weather.current.weatherCode);
+                            if(t < 0) return "Аяз бар. Қалың куртка, бөрік және қолғап киюді ұсынамыз.";
+                            if(t < 10) return "Күн салқын. Жылы күрте немесе пальто кигеніңіз дұрыс.";
+                            if(t < 20) return "Ауа райы қолайлы. Жемпір немесе жеңіл куртка жеткілікті.";
+                            return "Күн жылы. Жеңіл киім жарайды." + (isRaining ? " Қолшатыр алуды ұмытпаңыз!" : "");
+                          })}
+                        >
+                          Қазір не киіп шыққан дұрыс?
+                        </Button>
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          className="rounded-full text-xs font-medium bg-background/50 hover:bg-muted"
+                          onClick={() => handleQuestionSelect("Серуендеуге бола ма?", () => {
+                            const t = Math.round(weather.current.temperature);
+                            const isRaining = [51, 53, 55, 61, 63, 65, 80, 81, 82].includes(weather.current.weatherCode);
+                            const isSnowing = [71, 73, 75, 77, 85, 86].includes(weather.current.weatherCode);
+                            const wSpeed = Math.round(weather.current.windSpeed);
+                            if(isRaining) return "Жаңбыр жауып тұр, қолшатыр алғаныңыз жөн.";
+                            if(isSnowing) return "Қар жауып тұр, дала өте әдемі, бірақ жылы киініңіз.";
+                            if(t < -10) return "Күн тым суық, ұзақ серуендеуді ұсынбаймыз.";
+                            if(wSpeed > 30) return "Жел өте күшті, абай болыңыз.";
+                            return "Ауа райы серуендеуге тамаша!";
+                          })}
+                        >
+                          Серуендеуге бола ма?
+                        </Button>
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          className="rounded-full text-xs font-medium bg-background/50 hover:bg-muted"
+                          onClick={() => handleQuestionSelect(`${city.name} қаласындағы қазіргі ауа райы?`, () => {
+                            const t = Math.round(weather.current.temperature);
+                            const isRaining = [51, 53, 55, 61, 63, 65, 80, 81, 82].includes(weather.current.weatherCode);
+                            const isSnowing = [71, 73, 75, 77, 85, 86].includes(weather.current.weatherCode);
+                            const wSpeed = Math.round(weather.current.windSpeed);
+                            const conditionStr = isRaining ? "Жаңбыр жауып тұр" : isSnowing ? "Қар жауып тұр" : "Жауын-шашынсыз ашық";
+                            return `Қазір температура ${t}°C, жел жылдамдығы ${wSpeed} км/сағ. ${conditionStr}.`;
+                          })}
+                        >
+                          {city.name} қаласындағы қазіргі ауа райы?
+                        </Button>
+                    </div>
+                  </motion.div>
+                )}
+
                 {/* Activity Score Card */}
                 <ActivityScore data={weather} />
                 
@@ -176,63 +323,7 @@ export default function CityDetails() {
 
                 <SmartInsights data={weather} />
 
-                {/* City Specific FAQ Accordion */}
-                {city && (
-                  <motion.div
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    className="glass-panel rounded-3xl p-6 border-white/20"
-                  >
-                    <h3 className="font-semibold text-lg mb-4 text-primary">Жиі қойылатын сұрақтар ({city?.name} қаласы бойынша)</h3>
-                    <Accordion type="single" collapsible className="w-full">
-                      <AccordionItem value="q1">
-                        <AccordionTrigger className="text-left font-medium">Қазір не киіп шыққан дұрыс?</AccordionTrigger>
-                        <AccordionContent className="text-muted-foreground leading-relaxed">
-                          {(()=>{
-                            const t = Math.round(weather.current.temperature);
-                            const isRaining = [51, 53, 55, 61, 63, 65, 80, 81, 82].includes(weather.current.weatherCode);
-                            if(t < 0) return "Аяз бар. Қалың куртка, бөрік және қолғап киюді ұсынамыз.";
-                            if(t < 10) return "Күн салқын. Жылы күрте немесе пальто кигеніңіз дұрыс.";
-                            if(t < 20) return "Ауа райы қолайлы. Жемпір немесе жеңіл куртка жеткілікті.";
-                            return "Күн жылы. Жеңіл киім жарайды." + (isRaining ? " Қолшатыр алуды ұмытпаңыз!" : "");
-                          })()}
-                        </AccordionContent>
-                      </AccordionItem>
-
-                      <AccordionItem value="q2">
-                        <AccordionTrigger className="text-left font-medium">Серуендеуге бола ма?</AccordionTrigger>
-                        <AccordionContent className="text-muted-foreground leading-relaxed">
-                          {(()=>{
-                            const t = Math.round(weather.current.temperature);
-                            const isRaining = [51, 53, 55, 61, 63, 65, 80, 81, 82].includes(weather.current.weatherCode);
-                            const isSnowing = [71, 73, 75, 77, 85, 86].includes(weather.current.weatherCode);
-                            const wSpeed = Math.round(weather.current.windSpeed);
-                            
-                            if(isRaining) return "Жаңбыр жауып тұр, қолшатыр алғаныңыз жөн.";
-                            if(isSnowing) return "Қар жауып тұр, дала өте әдемі, бірақ жылы киініңіз.";
-                            if(t < -10) return "Күн тым суық, ұзақ серуендеуді ұсынбаймыз.";
-                            if(wSpeed > 30) return "Жел өте күшті, абай болыңыз.";
-                            return "Ауа райы серуендеуге тамаша!";
-                          })()}
-                        </AccordionContent>
-                      </AccordionItem>
-
-                      <AccordionItem value="q3" className="border-b-0">
-                        <AccordionTrigger className="text-left font-medium">{city?.name} қаласындағы қазіргі ауа райы?</AccordionTrigger>
-                        <AccordionContent className="text-muted-foreground leading-relaxed">
-                          {(()=>{
-                            const t = Math.round(weather.current.temperature);
-                            const isRaining = [51, 53, 55, 61, 63, 65, 80, 81, 82].includes(weather.current.weatherCode);
-                            const isSnowing = [71, 73, 75, 77, 85, 86].includes(weather.current.weatherCode);
-                            const wSpeed = Math.round(weather.current.windSpeed);
-                            const conditionStr = isRaining ? "Жаңбыр жауып тұр" : isSnowing ? "Қар жауып тұр" : "Жауын-шашынсыз ашық";
-                            return `Қазір температура ${t}°C, жел жылдамдығы ${wSpeed} км/сағ. ${conditionStr}.`;
-                          })()}
-                        </AccordionContent>
-                      </AccordionItem>
-                    </Accordion>
-                  </motion.div>
-                )}
+                {/* SmartInsights was below Activity and AQI - kept order below Chat */}
               </div>
               <div className="lg:col-span-1">
                 <DailyForecast data={weather} />
