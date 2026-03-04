@@ -1,5 +1,6 @@
 import { Link, useLocation } from "wouter";
 import { CloudSun, Home, MapPin, Search, Trophy } from "lucide-react";
+import { FaqChat } from "./faq-chat";
 
 export function Layout({ children }: { children: React.ReactNode }) {
   const [location] = useLocation();
@@ -38,6 +39,9 @@ export function Layout({ children }: { children: React.ReactNode }) {
       <main className="container mx-auto px-4 py-8">
         {children}
       </main>
+
+      {/* Global FAQ Chat Widget */}
+      <FaqChat />
 
       {/* Mobile Navigation */}
       <nav className="md:hidden fixed bottom-0 left-0 right-0 glass-panel border-t border-border/40 pb-safe">
