@@ -290,10 +290,11 @@ export default function CityDetails() {
                           size="sm"
                           className="rounded-full text-xs font-medium bg-background/50 hover:bg-muted"
                           onClick={() => handleQuestionSelect("Ертеңгі ауа райы қандай?", () => {
-                            if (!weather.daily || weather.daily.time.length < 2) return "Ертеңгі болжам әлі жүктелген жоқ.";
-                            const tMax = Math.round(weather.daily.temperature2mMax[1]);
-                            const tMin = Math.round(weather.daily.temperature2mMin[1]);
-                            const code = weather.daily.weatherCode[1];
+                            if (!weather.daily || weather.daily.length < 2) return "Ертеңгі болжам әлі жүктелген жоқ.";
+                            const tomorrow = weather.daily[1];
+                            const tMax = Math.round(tomorrow.tempMax);
+                            const tMin = Math.round(tomorrow.tempMin);
+                            const code = tomorrow.weatherCode;
                             const isRaining = [51, 53, 55, 61, 63, 65, 80, 81, 82].includes(code);
                             const isSnowing = [71, 73, 75, 77, 85, 86].includes(code);
                             const conditionStr = isRaining ? "жаңбыр жауады" : isSnowing ? "қар жауады" : "күн ашық болады";
