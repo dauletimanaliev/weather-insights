@@ -272,6 +272,37 @@ export default function CityDetails() {
                         >
                           {city.name} қаласындағы қазіргі ауа райы?
                         </Button>
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          className="rounded-full text-xs font-medium bg-background/50 hover:bg-muted"
+                          onClick={() => handleQuestionSelect("Ауа сапасы қандай?", () => {
+                            if (!aqi) return "Кешіріңіз, қазір ауа сапасы туралы мәлімет жоқ.";
+                            if (aqi.pm2_5 < 12) return "Ауа сапасы тамаша! Бүгін таза ауада серуендеуге өте қолайлы уақыт.";
+                            if (aqi.pm2_5 < 35) return "Ауа сапасы қанағаттанарлық. Сезімтал адамдарға сақ болу ұсынылады.";
+                            return "Ауа сапасы төмен. Далаға шыққанда бетперде киген жөн немесе үйде болыңыз.";
+                          })}
+                        >
+                          Ауа сапасы қандай?
+                        </Button>
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          className="rounded-full text-xs font-medium bg-background/50 hover:bg-muted"
+                          onClick={() => handleQuestionSelect("Ертеңгі ауа райы қандай?", () => {
+                            if (!weather.daily || weather.daily.time.length < 2) return "Ертеңгі болжам әлі жүктелген жоқ.";
+                            const tMax = Math.round(weather.daily.temperature2mMax[1]);
+                            const tMin = Math.round(weather.daily.temperature2mMin[1]);
+                            const code = weather.daily.weatherCode[1];
+                            const isRaining = [51, 53, 55, 61, 63, 65, 80, 81, 82].includes(code);
+                            const isSnowing = [71, 73, 75, 77, 85, 86].includes(code);
+                            const conditionStr = isRaining ? "жаңбыр жауады" : isSnowing ? "қар жауады" : "күн ашық болады";
+                            
+                            return `Ертең ${conditionStr}. Температура күндіз ${tMax}°C, түнде ${tMin}°C болады деп күтілуде.`;
+                          })}
+                        >
+                          Ертеңгі ауа райы қандай?
+                        </Button>
                     </div>
                   </motion.div>
                 )}
