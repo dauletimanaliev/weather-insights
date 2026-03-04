@@ -63,10 +63,18 @@ async function searchCities(query: string) {
 import { seedDatabase } from "./seed";
 import OpenAI from "openai";
 
-const openai = new OpenAI({
+const openai = process.env.AI_INTEGRATIONS_OPENAI_API_KEY ? new OpenAI({
   apiKey: process.env.AI_INTEGRATIONS_OPENAI_API_KEY,
   baseURL: process.env.AI_INTEGRATIONS_OPENAI_BASE_URL,
-});
+}) : ({
+  chat: {
+    completions: {
+      create: async () => ({
+        choices: [{ message: { content: "Жасанды интеллект API кілті орнатылмағандықтан, көмекші жұмыс істемей тұр." } }]
+      })
+    }
+  }
+} as unknown as OpenAI);
 
 export async function registerRoutes(
   httpServer: Server,

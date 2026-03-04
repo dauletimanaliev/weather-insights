@@ -1,4 +1,3 @@
-
 import { db } from "./db";
 import { cities, type City, type InsertCity } from "@shared/schema";
 import { eq, desc } from "drizzle-orm";
@@ -39,4 +38,52 @@ export class DatabaseStorage implements IStorage {
   }
 }
 
-export const storage = new DatabaseStorage();
+export class MemStorage implements IStorage {
+  private citiesMap: Map<number, City>;
+  private currentId: number;
+
+  constructor() {
+    this.citiesMap = new Map();
+    this.currentId = 1;
+  }
+
+  async getCities(): Promise<City[]> {
+    return Array.from(this.citiesMap.values()).sort((a, b) => {
+      // Sort desc by createdAt
+      return (b.createdAt?.getTime() || 0) - (a.createdAt?.getTime() || 0);
+    });
+  }
+
+  async getCity(id: number): Promise<City | undefined> {
+    return this.citiesMap.get(id);
+  }
+
+  async createCity(city: InsertCity): Promise<City> {
+    const id = this.currentId++;
+    const newCity: City = {
+      ...city,
+      id,
+      country: city.country ?? null,
+      admin1: city.admin1 ?? null,
+      isFavorite: city.isFavorite ?? false,
+      createdAt: new Date(),
+    };
+    this.citiesMap.set(id, newCity);
+    return newCity;
+  }
+
+  async deleteCity(id: number): Promise<void> {
+    this.citiesMap.delete(id);
+  }
+
+  async toggleFavoriteCity(id: number, isFavorite: boolean): Promise<City | undefined> {
+    const city = this.citiesMap.get(id);
+    if (!city) return undefined;
+    
+    const updated = { ...city, isFavorite };
+    this.citiesMap.set(id, updated);
+    return updated;
+  }
+}
+
+export const storage = process.env.DATABASE_URL ? new DatabaseStorage() : new MemStorage();
